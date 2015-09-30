@@ -1,0 +1,34 @@
+len1:
+.LFB24:
+	movl	$0, %eax 	//loads 32 bits of zero into lower half of %rax (%eax)
+	jmp	.L2		//jump to procedure .L2
+.L3:
+	addq	$1, %rax	//add one to the value in the register %rax
+.L2:
+	cmpq	$0, (%rdi,%rax,8)	//assigns ZF (0 flag) if the value at address (rdi + rax * 8) is 0
+	jne	.L3	//jump to procedure .L3 if the 0 flag is set at address (rdi + rax * 8)
+	rep ret		//return
+.LFE24:
+.LC0:
+	.string	"Answer: %ld\n"	//Sets aside 10 bytes for the respective string
+
+main:
+.LFB25:
+	subq	$8, %rsp  	//subtract 8 from rsp (the stack pointer) to make room for call
+	movl	$array, %edi 	//moves (address of) array into lower half of %rdi
+	call	len1 //calls procedure len1
+	movq	%rax, %rdx 	//moves %rax(result from len1) into %rdx
+	movl	$.LC0, %esi 	//moves string from $.LC0 into lower half of %rsi
+	movl	$1, %edi 	//moves 1 into %edi
+	movl	$0, %eax 	//moves 0 into lower half of eax
+	call	__printf_chk 	//prints string in %esi
+	addq	$8, %rsp	 //get rid of memory allocated for call
+	ret
+.LFE25:
+array:			//allocates starting address and continuous memory
+	.quad	13	//loads int 13 into first 4 bytes of array
+	.quad	192	//loads int 192 into second 4 bytes of array
+	.quad	2816	//loads int 2816 into third 4 bytes of array
+	.quad	40960	//loads int 40960 into fourth 4 bytes of array
+	.quad	0	//loads int 0 into fifth 4 bytes of array
+
